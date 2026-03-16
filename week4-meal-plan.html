@@ -224,126 +224,8 @@
     const weekdayNames = ["월요일", "화요일", "수요일", "목요일", "금요일"];
     const recentSignatures = [];
     const historyLimit = 5;
-
-    const mealPool = [
-      {
-        soup: "미소된장국",
-        main: "스팸꽈리고추볶음",
-        side: "스팸계란말이",
-        sources: [
-          { title: "개학! 아침밥. 스팸꽈리고추볶음, 미소된장국", url: "https://www.youtube.com/watch?v=cyOonpEAST8" },
-          { title: "겨울 아침밥. 바지락무국, 스팸계란말이", url: "https://www.youtube.com/watch?v=72wbJk72eWA" }
-        ]
-      },
-      {
-        soup: "김치떡국",
-        main: "카레가자미구이",
-        side: "감자조림",
-        sources: [
-          { title: "호다닥~ 아침바압~~ 김치떡국, 카레가자미구이", url: "https://www.youtube.com/watch?v=Tm6Xq-fGS58" },
-          { title: "아침밥. 간단 얼큰계란탕. 그리고 감자조림", url: "https://www.youtube.com/watch?v=_lHZG_9zaxI" }
-        ]
-      },
-      {
-        soup: "바지락무국",
-        main: "닭다리살구이",
-        side: "참치주먹밥",
-        sources: [
-          { title: "겨울 아침밥. 바지락무국, 스팸계란말이", url: "https://www.youtube.com/watch?v=72wbJk72eWA" },
-          { title: "오랜만에 아침밥. 닭다리살구이, 감자관자국", url: "https://www.youtube.com/watch?v=S16c83DCZzs" },
-          { title: "피자감자채전, 참치주먹밥, 딸바스무디", url: "https://www.youtube.com/watch?v=Fxia6UT_q3E" }
-        ]
-      },
-      {
-        soup: "사골시래기된장국",
-        main: "닭가슴살감자조림",
-        side: "두부과자",
-        sources: [
-          { title: "아침밥. 사골시래기된장국, 닭가슴살감자조림", url: "https://www.youtube.com/watch?v=SaqGVOV0LTU" },
-          { title: "떡갈비마요덮밥. 두부과자, 치킨퀘사디아", url: "https://www.youtube.com/watch?v=ge4brl4XNSo" }
-        ]
-      },
-      {
-        soup: "꽃게된장찌개(꽃게탕)",
-        main: "당면볶음",
-        side: "피자계란빵",
-        sources: [
-          { title: "고딩 저녁밥. 꽃게된장찌개", url: "https://www.youtube.com/watch?v=Rq9EQ7KKbTM" },
-          { title: "부대찌개, 당면볶음, 피자계란빵", url: "https://www.youtube.com/watch?v=tXIljQphMkA" }
-        ]
-      },
-      {
-        soup: "얼큰계란탕",
-        main: "제육볶음",
-        side: "치즈감자채전",
-        sources: [
-          { title: "아침밥. 간단 얼큰계란탕. 그리고 감자조림", url: "https://www.youtube.com/watch?v=_lHZG_9zaxI" },
-          { title: "아침밥. 닭가슴살감자국과 제육볶음", url: "https://www.youtube.com/watch?v=iLpjuuMBA0Y" },
-          { title: "저녁밥. 얼큰 소고기탕, 치즈 감자채전", url: "https://www.youtube.com/watch?v=hmd1XVK-BK4" }
-        ]
-      },
-      {
-        soup: "감자미역국",
-        main: "소고기가지볶음",
-        side: "양파계란밥",
-        sources: [
-          { title: "소고기 가지볶음. 감자 미역국", url: "https://www.youtube.com/watch?v=ViVXoezcsoM" },
-          { title: "양파만 넣어도 맛있어요! 양파계란밥", url: "https://www.youtube.com/watch?v=MAbMBF1TeY8" }
-        ]
-      },
-      {
-        soup: "간단설렁탕",
-        main: "떡갈비마요덮밥",
-        side: "치킨퀘사디아",
-        sources: [
-          { title: "방학 간단 한끼. 간단 설렁탕", url: "https://www.youtube.com/watch?v=0C1eqRzha2E" },
-          { title: "떡갈비마요덮밥. 두부과자, 치킨퀘사디아", url: "https://www.youtube.com/watch?v=ge4brl4XNSo" }
-        ]
-      },
-      {
-        soup: "황태감자국",
-        main: "새우완자전",
-        side: "소고기김밥",
-        sources: [
-          { title: "아침밥모음4. 소고기김밥, 황태감자국", url: "https://www.youtube.com/watch?v=iTWFY3xwzY8" }
-        ]
-      },
-      {
-        soup: "소고기배추국",
-        main: "버터새우구이",
-        side: "떡갈비",
-        sources: [
-          { title: "아침밥모음3. 버터새우구이, 소고기배추국", url: "https://www.youtube.com/watch?v=WafOhR9B5pg" },
-          { title: "아침밥모음3. 떡갈비, 황태두부국", url: "https://www.youtube.com/watch?v=WafOhR9B5pg" }
-        ]
-      },
-      {
-        soup: "표고버섯들깨미역국",
-        main: "간단떡갈비",
-        side: "피자빵",
-        sources: [
-          { title: "아침밥. 간단 떡갈비와 표고버섯 들깨미역국", url: "https://www.youtube.com/watch?v=aMNQn21U3QM" },
-          { title: "방학아침밥. 토마토카레, 꿀간장 닭날개 구이, 피자빵", url: "https://www.youtube.com/watch?v=7dZpKUWjuWY" }
-        ]
-      },
-      {
-        soup: "나주곰탕무국",
-        main: "소고기유부초밥",
-        side: "두부과자",
-        sources: [
-          { title: "아침밥. 소고기유부초밥, 나주곰탕무국", url: "https://www.youtube.com/watch?v=BFJS5sa0bNM" },
-          { title: "떡갈비마요덮밥. 두부과자, 치킨퀘사디아", url: "https://www.youtube.com/watch?v=ge4brl4XNSo" }
-        ]
-      }
-    ];
-
-    const fixedWeekPlan = [
-      mealPool[0],
-      mealPool[1],
-      mealPool[2],
-      mealPool[3],
-      mealPool[4]
-    ];
+    let mealPool = [];
+    let fixedWeekPlan = [];
 
     function shuffle(items) {
       const array = [...items];
@@ -354,9 +236,69 @@
       return array;
     }
 
+    function dedupePreserveOrder(items) {
+      const seen = new Set();
+      const result = [];
+      items.forEach((item) => {
+        const trimmed = String(item || "").trim();
+        if (!trimmed || seen.has(trimmed)) {
+          return;
+        }
+        seen.add(trimmed);
+        result.push(trimmed);
+      });
+      return result;
+    }
+
+    function extractMenuPhrases(video) {
+      const text = `${video.title || ""}\n${video.descriptionSnippet || ""}`;
+      const cleaned = text
+        .replace(/\([^)]*\)/g, " ")
+        .replace(/[✔️⭐✨*\[\]{}]/g, " ")
+        .replace(/\s+/g, " ");
+
+      const parts = cleaned
+        .split(/[,.!?·|]|그리고|\//g)
+        .map((value) => value.trim())
+        .filter(Boolean);
+
+      const menuKeyword = /(국|탕|찌개|볶음|구이|조림|전|채전|덮밥|주먹밥|김밥|초밥|계란말이|샐러드|우동|떡국|떡볶이|카레|퀘사디아|스테이크|돈까스|마파두부|설렁탕|곰탕|개장|짜글이|샤브샤브|닭한마리|피자빵|과자|동그랑땡)$/;
+      const fallbackKeyword = /(국|탕|찌개|볶음|구이|조림|전|밥|면|떡|카레|피자)/;
+
+      const candidates = parts.filter((part) => {
+        const shortEnough = part.length >= 2 && part.length <= 24;
+        if (!shortEnough) {
+          return false;
+        }
+        if (menuKeyword.test(part)) {
+          return true;
+        }
+        return fallbackKeyword.test(part) && !/영상|구독|이벤트|레시피|시청|감사/.test(part);
+      });
+
+      const unique = dedupePreserveOrder(candidates);
+      return unique.slice(0, 3);
+    }
+
+    function buildMealPool(videos) {
+      const mapped = videos
+        .map((video) => {
+          const menus = extractMenuPhrases(video);
+          if (menus.length < 2) {
+            return null;
+          }
+          return {
+            menus,
+            sources: [{ title: video.title, url: video.url }]
+          };
+        })
+        .filter(Boolean);
+      return mapped;
+    }
+
     function makeSignature(plans) {
       return plans
-        .map((plan) => `${plan.soup}|${plan.main}|${plan.side}`)
+        .map((plan) => plan.menus.join("|"))
         .join("||");
     }
 
@@ -393,6 +335,10 @@
         article.className = "card";
         article.style.animationDelay = `${dayIndex * 70}ms`;
 
+        const menuList = plan.menus
+          .map((menu) => `<li>${menu}</li>`)
+          .join("");
+
         const sourceLinks = plan.sources
           .map(
             (source) =>
@@ -402,11 +348,7 @@
 
         article.innerHTML = `
           <h2 class="day">${weekdayNames[dayIndex]}</h2>
-          <ul class="menus">
-            <li>${plan.soup}</li>
-            <li>${plan.main}</li>
-            <li>${plan.side}</li>
-          </ul>
+          <ul class="menus">${menuList}</ul>
           <div class="sources">출처: ${sourceLinks}</div>
         `;
 
@@ -422,19 +364,30 @@
         minute: "2-digit"
       });
       document.getElementById("updatedAt").textContent = `최근 갱신: ${updatedLabel}`;
-      document.getElementById("modeNote").textContent = `현재 표시: ${modeLabel} | 랜덤 히스토리 중복 방지: 최근 ${historyLimit}회`;
+      document.getElementById("modeNote").textContent = `현재 표시: ${modeLabel} | 메뉴 풀: 최근 100개 영상 기반 | 랜덤 중복 방지: 최근 ${historyLimit}회`;
     }
 
-    document.getElementById("randomizeButton").addEventListener("click", () => {
-      const randomPlan = getRandomWeekPlanWithoutRecentRepeat();
-      renderWeekPlan(randomPlan, "랜덤 4주차(평일 5일)");
-    });
+    async function initialize() {
+      const response = await fetch("./videos-100.json", { cache: "no-store" });
+      const videos = await response.json();
+      mealPool = buildMealPool(videos);
+      fixedWeekPlan = mealPool.slice(0, 5);
 
-    document.getElementById("showFixedButton").addEventListener("click", () => {
+      document.getElementById("randomizeButton").addEventListener("click", () => {
+        const randomPlan = getRandomWeekPlanWithoutRecentRepeat();
+        renderWeekPlan(randomPlan, "랜덤 4주차(평일 5일)");
+      });
+
+      document.getElementById("showFixedButton").addEventListener("click", () => {
+        renderWeekPlan(fixedWeekPlan, "기본 4주차(평일 5일)");
+      });
+
       renderWeekPlan(fixedWeekPlan, "기본 4주차(평일 5일)");
-    });
+    }
 
-    renderWeekPlan(fixedWeekPlan, "기본 4주차(평일 5일)");
+    initialize().catch((error) => {
+      document.getElementById("modeNote").textContent = `데이터 로드 실패: ${error.message}`;
+    });
   </script>
 </body>
 </html>

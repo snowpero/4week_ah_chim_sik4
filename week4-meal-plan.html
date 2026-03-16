@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4주차 식단표 (평일 5일)</title>
+  <style>
+    :root {
+      --bg-top: #f7efe3;
+      --bg-bottom: #e6f2ef;
+      --card: #fffdf8;
+      --text: #2f2a24;
+      --muted: #6f6457;
+      --line: #e7dbcc;
+      --accent: #b45f3a;
+      --accent-soft: #f8e5d8;
+      --shadow: 0 12px 30px rgba(64, 49, 33, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      color: var(--text);
+      background: linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .wrap {
+      width: min(1000px, 92vw);
+      margin: 36px auto 48px;
+    }
+
+    .title-box {
+      background: rgba(255, 253, 248, 0.8);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 22px 22px 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(4px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 3.8vw, 2.2rem);
+      letter-spacing: -0.02em;
+    }
+
+    .sub {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid #efcfbe;
+    }
+
+    .actions {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .random-button {
+      appearance: none;
+      border: 1px solid #d7b19b;
+      background: linear-gradient(180deg, #fff5ef, #ffe9dd);
+      color: #7a3f22;
+      border-radius: 10px;
+      padding: 9px 13px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+      box-shadow: 0 6px 14px rgba(122, 63, 34, 0.12);
+    }
+
+    .random-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(122, 63, 34, 0.16);
+    }
+
+    .secondary-button {
+      appearance: none;
+      border: 1px solid #d5cabf;
+      background: #fffdf8;
+      color: #5f5144;
+      border-radius: 10px;
+      padding: 9px 13px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+      box-shadow: 0 6px 14px rgba(86, 72, 60, 0.08);
+    }
+
+    .secondary-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(86, 72, 60, 0.12);
+    }
+
+    .grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      animation: cardIn 260ms ease both;
+    }
+
+    .day {
+      margin: 0;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+    }
+
+    .menus {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    .menus li {
+      margin: 5px 0;
+    }
+
+    .sources {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--line);
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .sources a {
+      color: #7b4427;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(123, 68, 39, 0.35);
+    }
+
+    .sources a:hover {
+      border-bottom-color: rgba(123, 68, 39, 0.9);
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    .updated-at {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .mode-note {
+      margin-top: 8px;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .wrap {
+        margin-top: 20px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="title-box">
+      <h1>4주차 식단표 (평일 5일)</h1>
+      <p class="sub">메뉴는 유튜브 <strong>@dalgomsamsam</strong> 채널의 <code>/videos</code> 원본 항목(제목/설명)에서만 가져왔습니다.</p>
+      <span class="badge">국/탕 1 + 메인 1 + 사이드 1</span>
+      <div class="actions">
+        <button id="randomizeButton" class="random-button" type="button">랜덤으로 갱신</button>
+        <button id="showFixedButton" class="secondary-button" type="button">기본 4주차 보기</button>
+      </div>
+      <p id="modeNote" class="mode-note"></p>
+    </section>
+
+    <section id="planGrid" class="grid" aria-label="4주차 평일 식단"></section>
+
+    <p class="footer-note">※ 주말은 제외했으며, 메뉴명은 채널 영상 제목/설명에 등장한 표현을 우선으로 사용했습니다.</p>
+    <p id="updatedAt" class="updated-at"></p>
+  </main>
+
+  <script>
+    const weekdayNames = ["월요일", "화요일", "수요일", "목요일", "금요일"];
+    const recentSignatures = [];
+    const historyLimit = 5;
+
+    const mealPool = [
+      {
+        soup: "미소된장국",
+        main: "스팸꽈리고추볶음",
+        side: "스팸계란말이",
+        sources: [
+          { title: "개학! 아침밥. 스팸꽈리고추볶음, 미소된장국", url: "https://www.youtube.com/watch?v=cyOonpEAST8" },
+          { title: "겨울 아침밥. 바지락무국, 스팸계란말이", url: "https://www.youtube.com/watch?v=72wbJk72eWA" }
+        ]
+      },
+      {
+        soup: "김치떡국",
+        main: "카레가자미구이",
+        side: "감자조림",
+        sources: [
+          { title: "호다닥~ 아침바압~~ 김치떡국, 카레가자미구이", url: "https://www.youtube.com/watch?v=Tm6Xq-fGS58" },
+          { title: "아침밥. 간단 얼큰계란탕. 그리고 감자조림", url: "https://www.youtube.com/watch?v=_lHZG_9zaxI" }
+        ]
+      },
+      {
+        soup: "바지락무국",
+        main: "닭다리살구이",
+        side: "참치주먹밥",
+        sources: [
+          { title: "겨울 아침밥. 바지락무국, 스팸계란말이", url: "https://www.youtube.com/watch?v=72wbJk72eWA" },
+          { title: "오랜만에 아침밥. 닭다리살구이, 감자관자국", url: "https://www.youtube.com/watch?v=S16c83DCZzs" },
+          { title: "피자감자채전, 참치주먹밥, 딸바스무디", url: "https://www.youtube.com/watch?v=Fxia6UT_q3E" }
+        ]
+      },
+      {
+        soup: "사골시래기된장국",
+        main: "닭가슴살감자조림",
+        side: "두부과자",
+        sources: [
+          { title: "아침밥. 사골시래기된장국, 닭가슴살감자조림", url: "https://www.youtube.com/watch?v=SaqGVOV0LTU" },
+          { title: "떡갈비마요덮밥. 두부과자, 치킨퀘사디아", url: "https://www.youtube.com/watch?v=ge4brl4XNSo" }
+        ]
+      },
+      {
+        soup: "꽃게된장찌개(꽃게탕)",
+        main: "당면볶음",
+        side: "피자계란빵",
+        sources: [
+          { title: "고딩 저녁밥. 꽃게된장찌개", url: "https://www.youtube.com/watch?v=Rq9EQ7KKbTM" },
+          { title: "부대찌개, 당면볶음, 피자계란빵", url: "https://www.youtube.com/watch?v=tXIljQphMkA" }
+        ]
+      },
+      {
+        soup: "얼큰계란탕",
+        main: "제육볶음",
+        side: "치즈감자채전",
+        sources: [
+          { title: "아침밥. 간단 얼큰계란탕. 그리고 감자조림", url: "https://www.youtube.com/watch?v=_lHZG_9zaxI" },
+          { title: "아침밥. 닭가슴살감자국과 제육볶음", url: "https://www.youtube.com/watch?v=iLpjuuMBA0Y" },
+          { title: "저녁밥. 얼큰 소고기탕, 치즈 감자채전", url: "https://www.youtube.com/watch?v=hmd1XVK-BK4" }
+        ]
+      },
+      {
+        soup: "감자미역국",
+        main: "소고기가지볶음",
+        side: "양파계란밥",
+        sources: [
+          { title: "소고기 가지볶음. 감자 미역국", url: "https://www.youtube.com/watch?v=ViVXoezcsoM" },
+          { title: "양파만 넣어도 맛있어요! 양파계란밥", url: "https://www.youtube.com/watch?v=MAbMBF1TeY8" }
+        ]
+      },
+      {
+        soup: "간단설렁탕",
+        main: "떡갈비마요덮밥",
+        side: "치킨퀘사디아",
+        sources: [
+          { title: "방학 간단 한끼. 간단 설렁탕", url: "https://www.youtube.com/watch?v=0C1eqRzha2E" },
+          { title: "떡갈비마요덮밥. 두부과자, 치킨퀘사디아", url: "https://www.youtube.com/watch?v=ge4brl4XNSo" }
+        ]
+      },
+      {
+        soup: "황태감자국",
+        main: "새우완자전",
+        side: "소고기김밥",
+        sources: [
+          { title: "아침밥모음4. 소고기김밥, 황태감자국", url: "https://www.youtube.com/watch?v=iTWFY3xwzY8" }
+        ]
+      },
+      {
+        soup: "소고기배추국",
+        main: "버터새우구이",
+        side: "떡갈비",
+        sources: [
+          { title: "아침밥모음3. 버터새우구이, 소고기배추국", url: "https://www.youtube.com/watch?v=WafOhR9B5pg" },
+          { title: "아침밥모음3. 떡갈비, 황태두부국", url: "https://www.youtube.com/watch?v=WafOhR9B5pg" }
+        ]
+      },
+      {
+        soup: "표고버섯들깨미역국",
+        main: "간단떡갈비",
+        side: "피자빵",
+        sources: [
+          { title: "아침밥. 간단 떡갈비와 표고버섯 들깨미역국", url: "https://www.youtube.com/watch?v=aMNQn21U3QM" },
+          { title: "방학아침밥. 토마토카레, 꿀간장 닭날개 구이, 피자빵", url: "https://www.youtube.com/watch?v=7dZpKUWjuWY" }
+        ]
+      },
+      {
+        soup: "나주곰탕무국",
+        main: "소고기유부초밥",
+        side: "두부과자",
+        sources: [
+          { title: "아침밥. 소고기유부초밥, 나주곰탕무국", url: "https://www.youtube.com/watch?v=BFJS5sa0bNM" },
+          { title: "떡갈비마요덮밥. 두부과자, 치킨퀘사디아", url: "https://www.youtube.com/watch?v=ge4brl4XNSo" }
+        ]
+      }
+    ];
+
+    const fixedWeekPlan = [
+      mealPool[0],
+      mealPool[1],
+      mealPool[2],
+      mealPool[3],
+      mealPool[4]
+    ];
+
+    function shuffle(items) {
+      const array = [...items];
+      for (let index = array.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [array[index], array[randomIndex]] = [array[randomIndex], array[index]];
+      }
+      return array;
+    }
+
+    function makeSignature(plans) {
+      return plans
+        .map((plan) => `${plan.soup}|${plan.main}|${plan.side}`)
+        .join("||");
+    }
+
+    function getRandomWeekPlanWithoutRecentRepeat() {
+      const maxAttempt = 80;
+
+      for (let attemptIndex = 0; attemptIndex < maxAttempt; attemptIndex += 1) {
+        const candidate = shuffle(mealPool).slice(0, 5);
+        const signature = makeSignature(candidate);
+        if (!recentSignatures.includes(signature)) {
+          recentSignatures.push(signature);
+          if (recentSignatures.length > historyLimit) {
+            recentSignatures.shift();
+          }
+          return candidate;
+        }
+      }
+
+      const fallback = shuffle(mealPool).slice(0, 5);
+      const fallbackSignature = makeSignature(fallback);
+      recentSignatures.push(fallbackSignature);
+      if (recentSignatures.length > historyLimit) {
+        recentSignatures.shift();
+      }
+      return fallback;
+    }
+
+    function renderWeekPlan(selectedPlans, modeLabel) {
+      const gridElement = document.getElementById("planGrid");
+      gridElement.innerHTML = "";
+
+      selectedPlans.forEach((plan, dayIndex) => {
+        const article = document.createElement("article");
+        article.className = "card";
+        article.style.animationDelay = `${dayIndex * 70}ms`;
+
+        const sourceLinks = plan.sources
+          .map(
+            (source) =>
+              `<a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.title}</a>`
+          )
+          .join(", ");
+
+        article.innerHTML = `
+          <h2 class="day">${weekdayNames[dayIndex]}</h2>
+          <ul class="menus">
+            <li>${plan.soup}</li>
+            <li>${plan.main}</li>
+            <li>${plan.side}</li>
+          </ul>
+          <div class="sources">출처: ${sourceLinks}</div>
+        `;
+
+        gridElement.appendChild(article);
+      });
+
+      const now = new Date();
+      const updatedLabel = now.toLocaleString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+      document.getElementById("updatedAt").textContent = `최근 갱신: ${updatedLabel}`;
+      document.getElementById("modeNote").textContent = `현재 표시: ${modeLabel} | 랜덤 히스토리 중복 방지: 최근 ${historyLimit}회`;
+    }
+
+    document.getElementById("randomizeButton").addEventListener("click", () => {
+      const randomPlan = getRandomWeekPlanWithoutRecentRepeat();
+      renderWeekPlan(randomPlan, "랜덤 4주차(평일 5일)");
+    });
+
+    document.getElementById("showFixedButton").addEventListener("click", () => {
+      renderWeekPlan(fixedWeekPlan, "기본 4주차(평일 5일)");
+    });
+
+    renderWeekPlan(fixedWeekPlan, "기본 4주차(평일 5일)");
+  </script>
+</body>
+</html>

@@ -224,7 +224,8 @@
     const weekdayNames = ["월요일", "화요일", "수요일", "목요일", "금요일"];
     const recentSignatures = [];
     const historyLimit = 5;
-    let mealPool = [];
+    const stopWords = /(영상|구독|이벤트|레시피|시청|감사|출간|응모|선물|제품|안내|사용한|재료|시작|오프닝|학교|등교|개학|방학|저녁밥|아침밥모음|우리|달곰)/;
+    let mealBank = { soups: [], mains: [], sides: [] };
     let fixedWeekPlan = [];
 
     function shuffle(items) {
@@ -234,6 +235,15 @@
         [array[index], array[randomIndex]] = [array[randomIndex], array[index]];
       }
       return array;
+    }
+
+    function normalizeMenuText(value) {
+      return String(value || "")
+        .replace(/\([^)]*\)/g, " ")
+        .replace(/[✔️⭐✨*#<>\[\]{}]/g, " ")
+        .replace(/\d{1,2}:\d{2}/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
     }
 
     function dedupePreserveOrder(items) {
@@ -250,50 +260,147 @@
       return result;
     }
 
-    function extractMenuPhrases(video) {
-      const text = `${video.title || ""}\n${video.descriptionSnippet || ""}`;
-      const cleaned = text
-        .replace(/\([^)]*\)/g, " ")
-        .replace(/[✔️⭐✨*\[\]{}]/g, " ")
-        .replace(/\s+/g, " ");
-
-      const parts = cleaned
-        .split(/[,.!?·|]|그리고|\//g)
+    function splitMenuCandidates(text) {
+      return normalizeMenuText(text)
+        .split(/[,.!?·|]|그리고|\/|\n/g)
         .map((value) => value.trim())
         .filter(Boolean);
-
-      const menuKeyword = /(국|탕|찌개|볶음|구이|조림|전|채전|덮밥|주먹밥|김밥|초밥|계란말이|샐러드|우동|떡국|떡볶이|카레|퀘사디아|스테이크|돈까스|마파두부|설렁탕|곰탕|개장|짜글이|샤브샤브|닭한마리|피자빵|과자|동그랑땡)$/;
-      const fallbackKeyword = /(국|탕|찌개|볶음|구이|조림|전|밥|면|떡|카레|피자)/;
-
-      const candidates = parts.filter((part) => {
-        const shortEnough = part.length >= 2 && part.length <= 24;
-        if (!shortEnough) {
-          return false;
-        }
-        if (menuKeyword.test(part)) {
-          return true;
-        }
-        return fallbackKeyword.test(part) && !/영상|구독|이벤트|레시피|시청|감사/.test(part);
-      });
-
-      const unique = dedupePreserveOrder(candidates);
-      return unique.slice(0, 3);
     }
 
-    function buildMealPool(videos) {
-      const mapped = videos
-        .map((video) => {
-          const menus = extractMenuPhrases(video);
-          if (menus.length < 2) {
-            return null;
+    function isMenuLikePhrase(phrase) {
+      if (phrase.length < 2 || phrase.length > 24) {
+        return false;
+      }
+      if (stopWords.test(phrase)) {
+        return false;
+      }
+      return /(국|탕|찌개|볶음|구이|조림|전|채전|덮밥|주먹밥|김밥|초밥|계란말이|샐러드|우동|떡국|떡볶이|카레|퀘사디아|스테이크|돈까스|마파두부|설렁탕|곰탕|개장|짜글이|샤브샤브|닭한마리|피자빵|과자|동그랑땡|만두랑땡|빵|스무디)$/.test(phrase);
+    }
+
+    function classifyMenu(phrase) {
+      if (/(국|탕|찌개|설렁탕|곰탕|우동|떡국|개장|순두부)$/.test(phrase)) {
+        return "soup";
+      }
+      if (/(볶음|구이|조림|주물럭|돈까스|스테이크|마파두부|샤브샤브|닭한마리|카레)$/.test(phrase)) {
+        return "main";
+      }
+      if (/(전|채전|덮밥|주먹밥|김밥|초밥|계란말이|샐러드|과자|빵|스무디|만두랑땡|동그랑땡)$/.test(phrase)) {
+        return "side";
+      }
+      return null;
+    }
+
+    function extractMenusFromVideo(video) {
+      const combined = [];
+      splitMenuCandidates(video.title).forEach((item) => combined.push(item));
+      splitMenuCandidates(video.descriptionSnippet).forEach((item) => combined.push(item));
+
+      const soups = [];
+      const mains = [];
+      const sides = [];
+
+      dedupePreserveOrder(combined).forEach((candidate) => {
+        if (!isMenuLikePhrase(candidate)) {
+          return;
+        }
+        const category = classifyMenu(candidate);
+        if (category === "soup") {
+          soups.push(candidate);
+          return;
+        }
+        if (category === "main") {
+          mains.push(candidate);
+          return;
+        }
+        if (category === "side") {
+          sides.push(candidate);
+        }
+      });
+
+      return {
+        soups: dedupePreserveOrder(soups),
+        mains: dedupePreserveOrder(mains),
+        sides: dedupePreserveOrder(sides)
+      };
+    }
+
+    function pickSourceTitle(video) {
+      const trimmed = normalizeMenuText(video.title);
+      return trimmed || "메뉴 출처";
+    }
+
+    function buildMealBank(videos) {
+      const soupMap = new Map();
+      const mainMap = new Map();
+      const sideMap = new Map();
+
+      videos.forEach((video) => {
+        const extracted = extractMenusFromVideo(video);
+        const source = { title: pickSourceTitle(video), url: video.url };
+
+        extracted.soups.forEach((name) => {
+          if (!soupMap.has(name)) {
+            soupMap.set(name, { name, source });
           }
-          return {
-            menus,
-            sources: [{ title: video.title, url: video.url }]
-          };
-        })
-        .filter(Boolean);
-      return mapped;
+        });
+        extracted.mains.forEach((name) => {
+          if (!mainMap.has(name)) {
+            mainMap.set(name, { name, source });
+          }
+        });
+        extracted.sides.forEach((name) => {
+          if (!sideMap.has(name)) {
+            sideMap.set(name, { name, source });
+          }
+        });
+      });
+
+      return {
+        soups: Array.from(soupMap.values()),
+        mains: Array.from(mainMap.values()),
+        sides: Array.from(sideMap.values())
+      };
+    }
+
+    function pickDistinctWithOffset(pool, count, seed) {
+      if (pool.length === 0) {
+        return [];
+      }
+      const selected = [];
+      const used = new Set();
+      let index = seed % pool.length;
+      while (selected.length < count && used.size < pool.length) {
+        const item = pool[index];
+        if (!used.has(item.name)) {
+          selected.push(item);
+          used.add(item.name);
+        }
+        index = (index + 1) % pool.length;
+      }
+      return selected;
+    }
+
+    function buildWeekFromBank(bank, seed = 0) {
+      const soups = pickDistinctWithOffset(bank.soups, 5, seed + 1);
+      const mains = pickDistinctWithOffset(bank.mains, 5, seed + 7);
+      const sides = pickDistinctWithOffset(bank.sides, 5, seed + 13);
+
+      const dayCount = Math.min(soups.length, mains.length, sides.length, 5);
+      const result = [];
+      for (let dayIndex = 0; dayIndex < dayCount; dayIndex += 1) {
+        const soup = soups[dayIndex];
+        const main = mains[dayIndex];
+        const side = sides[dayIndex];
+        const sourceMap = new Map();
+        [soup.source, main.source, side.source].forEach((source) => {
+          sourceMap.set(source.url, source);
+        });
+        result.push({
+          menus: [soup.name, main.name, side.name],
+          sources: Array.from(sourceMap.values())
+        });
+      }
+      return result;
     }
 
     function makeSignature(plans) {
@@ -304,9 +411,13 @@
 
     function getRandomWeekPlanWithoutRecentRepeat() {
       const maxAttempt = 80;
+      if (!mealBank.soups.length || !mealBank.mains.length || !mealBank.sides.length) {
+        return [];
+      }
 
       for (let attemptIndex = 0; attemptIndex < maxAttempt; attemptIndex += 1) {
-        const candidate = shuffle(mealPool).slice(0, 5);
+        const randomSeed = Math.floor(Math.random() * 5000) + attemptIndex;
+        const candidate = buildWeekFromBank(mealBank, randomSeed);
         const signature = makeSignature(candidate);
         if (!recentSignatures.includes(signature)) {
           recentSignatures.push(signature);
@@ -317,7 +428,7 @@
         }
       }
 
-      const fallback = shuffle(mealPool).slice(0, 5);
+      const fallback = buildWeekFromBank(mealBank, Math.floor(Math.random() * 9999));
       const fallbackSignature = makeSignature(fallback);
       recentSignatures.push(fallbackSignature);
       if (recentSignatures.length > historyLimit) {
@@ -329,6 +440,11 @@
     function renderWeekPlan(selectedPlans, modeLabel) {
       const gridElement = document.getElementById("planGrid");
       gridElement.innerHTML = "";
+
+      if (!selectedPlans.length) {
+        document.getElementById("modeNote").textContent = "표시할 식단 데이터가 부족합니다.";
+        return;
+      }
 
       selectedPlans.forEach((plan, dayIndex) => {
         const article = document.createElement("article");
@@ -364,14 +480,14 @@
         minute: "2-digit"
       });
       document.getElementById("updatedAt").textContent = `최근 갱신: ${updatedLabel}`;
-      document.getElementById("modeNote").textContent = `현재 표시: ${modeLabel} | 메뉴 풀: 최근 100개 영상 기반 | 랜덤 중복 방지: 최근 ${historyLimit}회`;
+      document.getElementById("modeNote").textContent = `현재 표시: ${modeLabel} | 메뉴 풀: 최근 100개 영상 기반(분류 강화) | 랜덤 중복 방지: 최근 ${historyLimit}회`;
     }
 
     async function initialize() {
       const response = await fetch("https://raw.githubusercontent.com/snowpero/4week_ah_chim_sik4/main/videos-100.json", { cache: "no-store" });
       const videos = await response.json();
-      mealPool = buildMealPool(videos);
-      fixedWeekPlan = mealPool.slice(0, 5);
+      mealBank = buildMealBank(videos);
+      fixedWeekPlan = buildWeekFromBank(mealBank, 0);
 
       document.getElementById("randomizeButton").addEventListener("click", () => {
         const randomPlan = getRandomWeekPlanWithoutRecentRepeat();

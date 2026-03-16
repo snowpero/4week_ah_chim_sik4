@@ -368,7 +368,7 @@
     }
 
     async function initialize() {
-      const response = await fetch("./videos-100.json", { cache: "no-store" });
+      const response = await fetch("https://raw.githubusercontent.com/snowpero/4week_ah_chim_sik4/main/videos-100.json", { cache: "no-store" });
       const videos = await response.json();
       mealPool = buildMealPool(videos);
       fixedWeekPlan = mealPool.slice(0, 5);

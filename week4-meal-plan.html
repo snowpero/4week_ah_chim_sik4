@@ -225,6 +225,13 @@
     const recentSignatures = [];
     const historyLimit = 5;
     const stopWords = /(영상|구독|이벤트|레시피|시청|감사|출간|응모|선물|제품|안내|사용한|재료|시작|오프닝|학교|등교|개학|방학|저녁밥|아침밥모음|우리|달곰)/;
+    const MENU_SUFFIXES = [
+      "계란말이", "샤브샤브", "닭한마리", "만두랑땡", "동그랑땡", "피자계란빵", "피자감자채전",
+      "설렁탕", "곰탕", "찌개", "볶음", "구이", "조림", "채전", "덮밥", "주먹밥", "김밥", "초밥",
+      "샐러드", "우동", "떡국", "떡볶이", "카레", "퀘사디아", "스테이크", "돈까스", "마파두부",
+      "개장", "짜글이", "스무디", "과자", "피자빵", "국", "탕", "전", "빵"
+    ];
+    const menuSuffixPattern = MENU_SUFFIXES.join("|");
     let mealBank = { soups: [], mains: [], sides: [] };
     let fixedWeekPlan = [];
 
@@ -261,10 +268,27 @@
     }
 
     function splitMenuCandidates(text) {
-      return normalizeMenuText(text)
+      return String(text || "")
+        .replace(/[✔️⭐✨*#<>\[\]{}]/g, " ")
+        .replace(/\d{1,2}:\d{2}/g, " ")
         .split(/[,.!?·|]|그리고|\/|\n/g)
         .map((value) => value.trim())
         .filter(Boolean);
+    }
+
+    function extractByRegex(text) {
+      const cleaned = normalizeMenuText(text);
+      const noSpace = cleaned.replace(/\s+/g, "");
+      const regex = new RegExp(`([가-힣A-Za-z0-9]{1,14}?(?:${menuSuffixPattern}))`, "g");
+      const results = [];
+
+      const fromCleaned = cleaned.match(regex) || [];
+      fromCleaned.forEach((item) => results.push(item.trim()));
+
+      const fromNoSpace = noSpace.match(regex) || [];
+      fromNoSpace.forEach((item) => results.push(item.trim()));
+
+      return results;
     }
 
     function isMenuLikePhrase(phrase) {
@@ -274,7 +298,7 @@
       if (stopWords.test(phrase)) {
         return false;
       }
-      return /(국|탕|찌개|볶음|구이|조림|전|채전|덮밥|주먹밥|김밥|초밥|계란말이|샐러드|우동|떡국|떡볶이|카레|퀘사디아|스테이크|돈까스|마파두부|설렁탕|곰탕|개장|짜글이|샤브샤브|닭한마리|피자빵|과자|동그랑땡|만두랑땡|빵|스무디)$/.test(phrase);
+      return /(국|탕|찌개|볶음|구이|조림|전|채전|덮밥|주먹밥|김밥|초밥|계란말이|샐러드|우동|떡국|떡볶이|카레|퀘사디아|스테이크|돈까스|마파두부|설렁탕|곰탕|개장|짜글이|샤브샤브|닭한마리|피자빵|피자계란빵|피자감자채전|과자|동그랑땡|만두랑땡|빵|스무디)$/.test(phrase);
     }
 
     function classifyMenu(phrase) {
@@ -294,6 +318,8 @@
       const combined = [];
       splitMenuCandidates(video.title).forEach((item) => combined.push(item));
       splitMenuCandidates(video.descriptionSnippet).forEach((item) => combined.push(item));
+      extractByRegex(video.title).forEach((item) => combined.push(item));
+      extractByRegex(video.descriptionSnippet).forEach((item) => combined.push(item));
 
       const soups = [];
       const mains = [];

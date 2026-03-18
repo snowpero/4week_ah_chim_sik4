@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>4주차 식단표</title>
-  <meta http-equiv="refresh" content="0; url=./week4-meal-plan.html" />
   <style>
     body {
       margin: 0;
@@ -15,6 +14,7 @@
       background: linear-gradient(140deg, #f7efe3, #e6f2ef);
       color: #2f2a24;
     }
+
     a {
       color: #7a3f22;
       text-decoration: none;
@@ -23,6 +23,25 @@
   </style>
 </head>
 <body>
-  <p>이동 중입니다... <a href="./week4-meal-plan.html">여기를 눌러 열기</a></p>
+  <p id="loadingText">페이지를 불러오는 중입니다...</p>
+  <script>
+    (async function loadMainPage() {
+      try {
+        const response = await fetch("./week4-meal-plan.html", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error("메인 페이지를 불러오지 못했습니다.");
+        }
+        const html = await response.text();
+        document.open();
+        document.write(html);
+        document.close();
+      } catch (error) {
+        const loadingText = document.getElementById("loadingText");
+        if (loadingText) {
+          loadingText.innerHTML = `불러오기에 실패했습니다. <a href="./week4-meal-plan.html">직접 열기</a>`;
+        }
+      }
+    })();
+  </script>
 </body>
 </html>
